@@ -1,7 +1,9 @@
 import User from '../models/user.model.js';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const SALT_ROUNDS = 10;
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function registerUser({ email, password }) {
   const isExists = await User.findOne({ where: { email }});
@@ -34,6 +36,17 @@ export async function loginUser({ email, password }) {
     throw err;
   }
 
-  const { password: _, ...safeUser} = user.toJSON();
-  return safeUser;
+  const accessToken = createAccessToken(user);
+  return accessToken;
+}
+
+function createAccessToken(user) {
+  const payload = {
+    sub: user.id,
+    email: user.email
+  }
+
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h'});
+
+  return token
 }
