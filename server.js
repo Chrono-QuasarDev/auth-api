@@ -4,7 +4,6 @@ import sequelize from './src/config/db.js';
 async function start() {
   try {
     await sequelize.authenticate();
-    await sequelize.sync();
     console.log('DB connected');
     app.listen(3000, () => console.log('Server running at http://localhost:3000'));
   } catch (error) {
